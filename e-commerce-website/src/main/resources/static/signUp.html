@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #444;
+        }
+        
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #4a86e8;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(74, 134, 232, 0.2);
+        }
+        
+        .error {
+            color: #d93025;
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .success-message {
+            text-align: center;
+            color: #0f9d58;
+            font-weight: 600;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .login-link {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+        }
+        
+        .login-link a {
+            color: #4a86e8;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        
+        .input-error {
+            border-color: #d93025;
+        }
+        
+        .input-success {
+            border-color: #0f9d58;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Create Account</h1>
+        <form id="signupForm">
+            <div class="form-group">
+                <label for="name">Full Name</label>
+                <input type="text" id="name" name="name" placeholder="Enter your full name">
+                <div class="error" id="nameError">Please enter your full name</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" name="email" placeholder="Enter your email">
+                <div class="error" id="emailError">Please enter a valid email address</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" id="phone" name="phone" placeholder="Enter your phone number">
+                <div class="error" id="phoneError">Please enter a valid phone number</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="address">Address</label>
+                <input type="text" id="address" name="address" placeholder="Enter your address">
+                <div class="error" id="addressError">Please enter your address</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Create a password">
+                <div class="error" id="passwordError">Password must be at least 6 characters</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password">
+                <div class="error" id="confirmPasswordError">Passwords do not match</div>
+            </div>
+            
+            <button type="submit">Sign Up</button>
+        </form>
+        
+        <div class="success-message" id="successMessage">
+            Registration successful! Redirecting...
+        </div>
+        
+        <div class="login-link">
+            Already have an account? <a href="login.html">Log in</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('signupForm');
+            const inputs = form.querySelectorAll('input');
+            
+            // Validation functions
+            function validateName() {
+                const name = document.getElementById('name');
+                const error = document.getElementById('nameError');
+                
+                if (name.value.trim() === '') {
+                    showError(name, error, 'Please enter your full name');
+                    return false;
+                } else {
+                    showSuccess(name);
+                    return true;
+                }
+            }
+            
+            function validateEmail() {
+                const email = document.getElementById('email');
+                const error = document.getElementById('emailError');
+                const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                
+                if (email.value.trim() === '') {
+                    showError(email, error, 'Please enter your email address');
+                    return false;
+                } else if (!emailPattern.test(email.value)) {
+                    showError(email, error, 'Please enter a valid email address');
+                    return false;
+                } else {
+                    showSuccess(email);
+                    return true;
+                }
+            }
+            
+            function validatePhone() {
+                const phone = document.getElementById('phone');
+                const error = document.getElementById('phoneError');
+                // Simple phone validation - at least 10 digits
+                const phonePattern = /^[\d\s\-\+\(\)]{10,}$/;
+                
+                if (phone.value.trim() === '') {
+                    showError(phone, error, 'Please enter your phone number');
+                    return false;
+                } else if (!phonePattern.test(phone.value)) {
+                    showError(phone, error, 'Please enter a valid phone number');
+                    return false;
+                } else {
+                    showSuccess(phone);
+                    return true;
+                }
+            }
+            
+            function validateAddress() {
+                const address = document.getElementById('address');
+                const error = document.getElementById('addressError');
+                
+                if (address.value.trim() === '') {
+                    showError(address, error, 'Please enter your address');
+                    return false;
+                } else {
+                    showSuccess(address);
+                    return true;
+                }
+            }
+            
+            function validatePassword() {
+                const password = document.getElementById('password');
+                const error = document.getElementById('passwordError');
+                
+                if (password.value === '') {
+                    showError(password, error, 'Please enter a password');
+                    return false;
+                } else if (password.value.length < 6) {
+                    showError(password, error, 'Password must be at least 6 characters');
+                    return false;
+                } else {
+                    showSuccess(password);
+                    return true;
+                }
+            }
+            
+            function validateConfirmPassword() {
+                const password = document.getElementById('password');
+                const confirmPassword = document.getElementById('confirmPassword');
+                const error = document.getElementById('confirmPasswordError');
+                
+                if (confirmPassword.value === '') {
+                    showError(confirmPassword, error, 'Please confirm your password');
+                    return false;
+                } else if (confirmPassword.value !== password.value) {
+                    showError(confirmPassword, error, 'Passwords do not match');
+                    return false;
+                } else {
+                    showSuccess(confirmPassword);
+                    return true;
+                }
+            }
+            
+            function showError(input, errorElement, message) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                input.classList.add('input-error');
+                input.classList.remove('input-success');
+            }
+            
+            function showSuccess(input) {
+                const errorElement = input.nextElementSibling;
+                if (errorElement && errorElement.classList.contains('error')) {
+                    errorElement.style.display = 'none';
+                }
+                input.classList.remove('input-error');
+                input.classList.add('input-success');
+            }
+            
+            // Add event listeners for real-time validation
+            document.getElementById('name').addEventListener('blur', validateName);
+            document.getElementById('email').addEventListener('blur', validateEmail);
+            document.getElementById('phone').addEventListener('blur', validatePhone);
+            document.getElementById('address').addEventListener('blur', validateAddress);
+            document.getElementById('password').addEventListener('blur', validatePassword);
+            document.getElementById('confirmPassword').addEventListener('blur', validateConfirmPassword);
+            
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Validate all fields
+                const isNameValid = validateName();
+                const isEmailValid = validateEmail();
+                const isPhoneValid = validatePhone();
+                const isAddressValid = validateAddress();
+                const isPasswordValid = validatePassword();
+                const isConfirmPasswordValid = validateConfirmPassword();
+                
+                if (isNameValid && isEmailValid && isPhoneValid && 
+                    isAddressValid && isPasswordValid && isConfirmPasswordValid) {
+                    
+                    // Prepare the data for submission (excluding confirmPassword)
+                    const formData = {
+                        name: document.getElementById('name').value,
+                        email: document.getElementById('email').value,
+                        phone: document.getElementById('phone').value,
+                        address: document.getElementById('address').value,
+                        password: document.getElementById('password').value
+                    };
+                    
+                    // Send the data using axios
+                    axios.post('/SignUp', formData)
+                        .then(function(response) {
+                            // Show success message
+                            document.getElementById('successMessage').style.display = 'block';
+                            form.reset();
+                            
+                            // Remove success borders
+                            inputs.forEach(input => {
+                                input.classList.remove('input-success');
+                            });
+                            
+                            // Redirect after a short delay (simulation)
+                            setTimeout(() => {
+                                 window.location.href = 'login.html';
+                            }, 2000);
+                        })
+                        .catch(function(error) {
+                            if (error.response) {
+                                // The server responded with an error status
+                                if (error.response.status === 400) {
+                                    alert(error.response.data);
+                                } else {
+                                    alert('An error occurred: ' + error.response.data);
+                                }
+                            } else {
+                                alert('Network error: Please try again later.');
+                            }
+                        });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

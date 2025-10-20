@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Product Admin Dashboard</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+.product-image {
+	width: 60px;
+	height: 60px;
+	object-fit: cover;
+	border-radius: 4px;
+}
+
+.card {
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+	margin-bottom: 20px;
+}
+
+.table th {
+	background-color: #f8f9fa;
+}
+
+.status-badge {
+	padding: 5px 10px;
+	border-radius: 20px;
+	font-size: 0.8rem;
+}
+
+.active-status {
+	background-color: #d4edda;
+	color: #155724;
+}
+
+.inactive-status {
+	background-color: #f8d7da;
+	color: #721c24;
+}
+
+.preview-image {
+	width: 100px;
+	height: 100px;
+	object-fit: cover;
+	margin: 5px;
+	border-radius: 4px;
+}
+
+.image-preview-container {
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: 10px;
+}
+
+.action-buttons .btn {
+	margin-right: 5px;
+}
+
+.required-field::after {
+	content: "*";
+	color: red;
+	margin-left: 3px;
+}
+
+.image-preview-item {
+    position: relative;
+    display: inline-block;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
+.remove-existing-image, 
+.remove-new-image {
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.remove-existing-image:hover, 
+.remove-new-image:hover {
+    opacity: 1;
+}
+
+.image-info {
+    font-size: 0.75rem;
+    text-align: center;
+    margin-top: 5px;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+</style>
+</head>
+<body>
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+		<div class="container">
+			<a class="navbar-brand" href="#"> <i class="fas fa-box-open me-2"></i>Product
+				Admin Dashboard
+			</a>
+			<button class="navbar-toggler" type="button"
+				data-bs-toggle="collapse" data-bs-target="#navbarNav">
+				<span class="navbar-toggler-icon"></span>
+			</button>
+		</div>
+	</nav>
+
+	<div class="container mt-4">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="d-flex justify-content-between align-items-center mb-4">
+					<h2>Product Management</h2>
+					<button class="btn btn-primary" data-bs-toggle="modal"
+						data-bs-target="#productModal">
+						<i class="fas fa-plus me-1"></i> Add New Product
+					</button>
+				</div>
+
+				<!-- Product List -->
+				<div class="card">
+					<div class="card-header bg-white">
+						<h5 class="mb-0">Product List</h5>
+					</div>
+					<div class="card-body">
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead>
+									<tr>
+										<th>ID</th>
+										<th>Image</th>
+										<th>Name</th>
+										<th>Discount</th>
+										<th>Price</th>
+										<th>Quantity</th>
+										<th>Category</th>
+										<th>Status</th>
+										<th>Actions</th>
+									</tr>
+								</thead>
+								<tbody id="productTableBody">
+									<!-- Products will be loaded here -->
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Add/Edit Product Modal -->
+	<div class="modal fade" id="productModal" tabindex="-1"
+		aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="modalTitle">Add New Product</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<form id="productForm" enctype="multipart/form-data">
+					<div class="modal-body">
+						<input type="hidden" id="productId">
+
+						<div class="row">
+							<div class="col-md-6">
+								<div class="mb-3">
+									<label for="name" class="form-label required-field">Product
+										Name</label> <input type="text" class="form-control" id="name"
+										name="name" required>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="mb-3">
+									<label for="sku" class="form-label required-field">Discount</label>
+									<input type="number" class="form-control" id="sku" name="sku"
+										required>
+								</div>
+							</div>
+						</div>
+
+						<div class="mb-3">
+							<label for="description" class="form-label">Description</label>
+							<textarea class="form-control" id="description"
+								name="description" rows="3"></textarea>
+						</div>
+
+						<div class="row">
+							<div class="col-md-4">
+								<div class="mb-3">
+									<label for="price" class="form-label required-field">Price</label>
+									<input type="number" class="form-control" id="price"
+										name="price" step="0.01" min="0" required>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="mb-3">
+									<label for="quantity" class="form-label">Quantity</label> <input
+										type="number" class="form-control" id="quantity"
+										name="quantity" min="0">
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="mb-3">
+									<label class="form-check-label" for="active">Status</label>
+									<div class="form-check form-switch mt-2">
+										<input class="form-check-input" type="checkbox" id="active"
+											name="active" checked> <label
+											class="form-check-label" for="active">Active</label>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="row">
+							<div class="col-md-6">
+								<div class="mb-3">
+									<label for="category" class="form-label">Category</label> <input
+										type="text" class="form-control" id="category" name="category">
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="mb-3">
+									<label for="brand" class="form-label">Brand</label> <input
+										type="text" class="form-control" id="brand" name="brand">
+								</div>
+							</div>
+						</div>
+
+						<div class="mb-3">
+							<label for="images" class="form-label required-field">Product Images</label> 
+							<input class="form-control" type="file" id="images" name="images"
+								multiple accept="image/*">
+							<div class="form-text">Select at least one image for the product</div>
+
+							<!-- Hidden input to store removed image IDs -->
+							<input type="hidden" id="removedImageIds" name="removedImageIds">
+
+							<div class="image-preview-container" id="imagePreview">
+								<!-- Existing images with delete buttons will be added here -->
+							</div>
+							
+							<div id="imageWarning" class="text-danger mt-2" style="display: none;">
+								At least one image is required for the product.
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary"
+							data-bs-dismiss="modal">Cancel</button>
+						<button type="submit" class="btn btn-primary">Save
+							Product</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<!-- View Product Modal -->
+	<div class="modal fade" id="viewProductModal" tabindex="-1"
+		aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Product Details</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body" id="productDetails">
+					<!-- Product details will be loaded here -->
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Confirmation Modal -->
+	<div class="modal fade" id="confirmModal" tabindex="-1"
+		aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">Confirm Deletion</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<p>Are you sure you want to delete this product? This action
+						cannot be undone.</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-danger" id="confirmDelete">Delete</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+	<script>
+        // Base URL for API endpoints
+        const API_BASE_URL = 'http://localhost:8080'; // Change this to your actual API URL
+
+        // DOM elements
+        const productForm = document.getElementById('productForm');
+        const productTableBody = document.getElementById('productTableBody');
+        const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+        const viewProductModal = new bootstrap.Modal(document.getElementById('viewProductModal'));
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+        const modalTitle = document.getElementById('modalTitle');
+        const imageInput = document.getElementById('images');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageWarning = document.getElementById('imageWarning');
+        
+        let currentProductId = null;
+        let existingImageCount = 0;
+        let newImageCount = 0;
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', loadProducts);
+        productForm.addEventListener('submit', handleFormSubmit);
+        imageInput.addEventListener('change', handleImagePreview);
+        document.getElementById('confirmDelete').addEventListener('click', deleteProduct);
+
+        // Load all products
+        function loadProducts() {
+            axios.get(`${API_BASE_URL}/Adproducts`)
+                .then(response => {
+                    renderProducts(response.data);
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                    alert('Error loading products: ' + error.message);
+                });
+        }
+
+        // Render products in the table
+        function renderProducts(products) {
+            productTableBody.innerHTML = '';
+            
+            if (products.length === 0) {
+                productTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-4">No products found. Click "Add New Product" to create one.</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            products.forEach(product => {
+                const row = document.createElement('tr');
+                
+                // Get the first image for thumbnail or use a placeholder
+                const imageSrc = product.images && product.images.length > 0 
+                    ? `data:image/jpeg;base64,${product.images[0]}` 
+                    : 'https://via.placeholder.com/60x60?text=No+Image';
+                
+                row.innerHTML = `
+                    <td>${product.id}</td>
+                    <td><img src="${imageSrc}" class="product-image" alt="${product.name}"></td>
+                    <td>${product.name}</td>
+                    <td>${product.sku}%</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>${product.quantity}</td>
+                    <td>${product.category || '-'}</td>
+                    <td>
+                        <span class="status-badge ${product.active ? 'active-status' : 'inactive-status'}">
+                            ${product.active ? 'Active' : 'Inactive'}
+                        </span>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-info view-btn" data-id="${product.id}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning edit-btn" data-id="${product.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-sm btn-danger delete-btn" data-id="${product.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                productTableBody.appendChild(row);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', () => viewProduct(btn.getAttribute('data-id')));
+            });
+            
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', () => editProduct(btn.getAttribute('data-id')));
+            });
+            
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', () => showDeleteConfirm(btn.getAttribute('data-id')));
+            });
+        }
+
+        // View product details
+        function viewProduct(id) {
+            axios.get(`${API_BASE_URL}/Adproducts`)
+                .then(response => {
+                    const product = response.data.find(p => p.id == id);
+                    if (product) {
+                        showProductDetails(product);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching product:', error);
+                    alert('Error fetching product details: ' + error.message);
+                });
+        }
+
+        // Show product details in modal
+        function showProductDetails(product) {
+            const productDetails = document.getElementById('productDetails');
+            
+            // Create image HTML
+            let imagesHtml = '';
+            if (product.images && product.images.length > 0) {
+                imagesHtml = '<div class="d-flex flex-wrap mt-2">';
+                product.images.forEach(img => {
+                    imagesHtml += `<img src="data:image/jpeg;base64,${img}" class="preview-image" alt="Product Image">`;
+                });
+                imagesHtml += '</div>';
+            } else {
+                imagesHtml = '<p>No images available</p>';
+            }
+            
+            productDetails.innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>${product.name}</h4>
+                        <p><strong>Discount:</strong> ${product.sku}%</p>
+                        <p><strong>Description:</strong> ${product.description || 'N/A'}</p>
+                        <p><strong>Price:</strong> $${product.price.toFixed(2)}</p>
+                        <p><strong>Quantity:</strong> ${product.quantity}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Category:</strong> ${product.category || 'N/A'}</p>
+                        <p><strong>Brand:</strong> ${product.brand || 'N/A'}</p>
+                        <p><strong>Status:</strong> 
+                            <span class="status-badge ${product.active ? 'active-status' : 'inactive-status'}">
+                                ${product.active ? 'Active' : 'Inactive'}
+                            </span>
+                        </p>
+                        <p><strong>Created:</strong> ${new Date(product.createdAt).toLocaleString()}</p>
+                        <p><strong>Last Updated:</strong> ${new Date(product.updatedAt).toLocaleString()}</p>
+                    </div>
+                </div>
+                <div class="mt-3">
+                    <h5>Product Images</h5>
+                    ${imagesHtml}
+                </div>
+            `;
+            
+            viewProductModal.show();
+        }
+
+        // Fill form with product data for editing
+        function fillFormWithProductData(product) {
+            document.getElementById('productId').value = product.id;
+            document.getElementById('name').value = product.name;
+            document.getElementById('description').value = product.description || '';
+            document.getElementById('price').value = product.price;
+            document.getElementById('quantity').value = product.quantity;
+            document.getElementById('category').value = product.category || '';
+            document.getElementById('brand').value = product.brand || '';
+            document.getElementById('sku').value = product.sku;
+            document.getElementById('active').checked = product.active;
+            
+            // Clear image preview
+            imagePreview.innerHTML = '';
+            
+            // Reset image counters
+            existingImageCount = 0;
+            newImageCount = 0;
+            
+            // Show existing images if any
+            if (product.images && product.images.length > 0 && product.imageIds) {
+                displayExistingImages(product.images, product.imageIds);
+                existingImageCount = product.images.length;
+            }
+            
+            // Update image requirement warning
+            updateImageWarning();
+        }
+
+        // Show delete confirmation
+        function showDeleteConfirm(id) {
+            currentProductId = id;
+            confirmModal.show();
+        }
+
+        // Delete product
+        function deleteProduct() {
+            if (!currentProductId) return;
+            
+            axios.delete(`${API_BASE_URL}/Addeleteproducts/${currentProductId}`)
+                .then(response => {
+                    confirmModal.hide();
+                    alert('Product deleted successfully');
+                    loadProducts();
+                })
+                .catch(error => {
+                    console.error('Error deleting product:', error);
+                    alert('Error deleting product: ' + error.message);
+                });
+        }
+
+        // Function to display existing images with delete buttons
+        function displayExistingImages(images, imageIds) {
+            imagePreview.innerHTML = '';
+            
+            if (images && images.length > 0) {
+                images.forEach((imgData, index) => {
+                    const imgElement = document.createElement('div');
+                    imgElement.className = 'image-preview-item position-relative d-inline-block me-2 mb-2';
+                    
+                    // Generate a filename based on product ID and image index
+                    const fileName = `product-${currentProductId}-image-${index+1}.jpg`;
+                    
+                    imgElement.innerHTML = `
+                        <img src="data:image/jpeg;base64,${imgData}" class="preview-image" alt="Product Image">
+                        <div class="image-info">${fileName}</div>
+                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-1 remove-existing-image" 
+                            data-image-id="${imageIds[index]}" title="Remove image">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    imagePreview.appendChild(imgElement);
+                });
+            }
+            
+            // Add event listeners to remove buttons
+            document.querySelectorAll('.remove-existing-image').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const imageId = this.getAttribute('data-image-id');
+                    removeExistingImage(imageId, this.closest('.image-preview-item'));
+                });
+            });
+        }
+
+        // Function to remove an existing image
+        function removeExistingImage(imageId, imageElement) {
+            // Add to removed images list
+            let removedImageIds = JSON.parse(document.getElementById('removedImageIds').value || '[]');
+            removedImageIds.push(parseInt(imageId));
+            document.getElementById('removedImageIds').value = JSON.stringify(removedImageIds);
+            
+            // Decrease existing image count
+            existingImageCount--;
+            
+            // Remove from UI
+            imageElement.remove();
+            
+            // Update image requirement warning
+            updateImageWarning();
+        }
+
+        // Function to handle new image previews
+        function handleImagePreview() {
+            const files = imageInput.files;
+            newImageCount = files.length;
+            
+            // Clear previous new image previews
+            document.querySelectorAll('.new-image-preview').forEach(el => el.remove());
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const previewItem = document.createElement('div');
+                    previewItem.className = 'image-preview-item position-relative d-inline-block me-2 mb-2 new-image-preview';
+                    
+                    previewItem.innerHTML = `
+                        <img src="${e.target.result}" class="preview-image" alt="New Image">
+                        <div class="image-info">${file.name}</div>
+                        <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 p-1 remove-new-image" title="Remove image">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    imagePreview.appendChild(previewItem);
+                    
+                    // Add event listener to remove button
+                    previewItem.querySelector('.remove-new-image').addEventListener('click', function() {
+                        previewItem.remove();
+                        newImageCount--;
+                        
+                        // Create a new FileList without the removed file
+                        const dataTransfer = new DataTransfer();
+                        for (let j = 0; j < files.length; j++) {
+                            if (j !== i) {
+                                dataTransfer.items.add(files[j]);
+                            }
+                        }
+                        imageInput.files = dataTransfer.files;
+                        
+                        // Update image requirement warning
+                        updateImageWarning();
+                    });
+                };
+                
+                reader.readAsDataURL(file);
+            }
+            
+            // Update image requirement warning
+            updateImageWarning();
+        }
+
+        // Update image requirement warning based on current image count
+        function updateImageWarning() {
+            const totalImages = existingImageCount + newImageCount;
+            
+            if (totalImages === 0) {
+                imageWarning.style.display = 'block';
+            } else {
+                imageWarning.style.display = 'none';
+            }
+        }
+
+        // Edit product
+        function editProduct(id) {
+            axios.get(`${API_BASE_URL}/Adproducts`)
+                .then(response => {
+                    const product = response.data.find(p => p.id == id);
+                    if (product) {
+                        currentProductId = id;
+                        fillFormWithProductData(product);
+                        modalTitle.textContent = 'Edit Product';
+                        
+                        // Display existing images with delete buttons
+                        if (product.images && product.imageIds) {
+                            displayExistingImages(product.images, product.imageIds);
+                        }
+                        
+                        productModal.show();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching product:', error);
+                    alert('Error fetching product: ' + error.message);
+                });
+        }
+
+        // Handle form submission
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            // Validate that at least one image exists
+            const totalImages = existingImageCount + newImageCount;
+            if (totalImages === 0) {
+                alert('At least one image is required for the product.');
+                return;
+            }
+            
+            const formData = new FormData();
+            const removedImageIds = JSON.parse(document.getElementById('removedImageIds').value || '[]');
+            const productData = {
+                name: document.getElementById('name').value,
+                description: document.getElementById('description').value,
+                price: parseFloat(document.getElementById('price').value),
+                quantity: parseInt(document.getElementById('quantity').value),
+                category: document.getElementById('category').value,
+                brand: document.getElementById('brand').value,
+                sku: document.getElementById('sku').value,
+                active: document.getElementById('active').checked,
+                imageIdsToRemove: removedImageIds
+            };
+            
+            // Add product data as JSON string
+            formData.append('product', new Blob([JSON.stringify(productData)], { type: 'application/json' }));
+            
+            // Add image files
+            const imageFiles = document.getElementById('images').files;
+            for (let i = 0; i < imageFiles.length; i++) {
+                formData.append('images', imageFiles[i]);
+            }
+            
+            const productId = document.getElementById('productId').value;
+            
+            if (productId) {
+                // Update existing product
+                axios.put(`${API_BASE_URL}/Adupdateproducts/${productId}`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then(response => {
+                    productModal.hide();
+                    alert('Product updated successfully');
+                    loadProducts();
+                    resetForm();
+                })
+                .catch(error => {
+                    console.error('Error updating product:', error);
+                    alert('Error updating product: ' + error.message);
+                });
+            } else {
+                // Add new product
+                axios.post(`${API_BASE_URL}/Adaddproducts`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                })
+                .then(response => {
+                    productModal.hide();
+                    alert('Product added successfully');
+                    loadProducts();
+                    resetForm();
+                })
+                .catch(error => {
+                    console.error('Error adding product:', error);
+                    alert('Error adding product: ' + error.message);
+                });
+            }
+        }
+
+        // Reset form
+        function resetForm() {
+            productForm.reset();
+            imagePreview.innerHTML = '';
+            document.getElementById('removedImageIds').value = '[]';
+            currentProductId = null;
+            existingImageCount = 0;
+            newImageCount = 0;
+            imageWarning.style.display = 'none';
+            modalTitle.textContent = 'Add New Product';
+        }
+    </script>
+</body>
+</html>
