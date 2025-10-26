@@ -1,0 +1,53 @@
+image: docker:27.0.3 # Use Docker CLI image
+
+services:
+  - docker:dind # Enable Docker-in-Docker service
+
+variables:
+  DOCKER_DRIVER: overlay2
+  MAVEN_CLI_OPTS: "-B -e -V"
+  PROJECT_NAME: springboot-sample
+  IMAGE_NAME: $CI_REGISTRY_IMAGE:$CI_COMMIT_SHORT_SHA
+
+stages:
+  - build
+  - dockerize
+  - deploy
+
+# Stage 1: Build JAR using Maven inside Docker container
+build:
+  stage: build
+  image: maven:3.9.4-eclipse-temurin-17
+  script:
+    - echo "Building Spring Boot application with Maven..."
+    - mvn $MAVEN_CLI_OPTS clean package -DskipTests
+  artifacts:
+    paths:
+      - target/*.jar
+  only:
+    - main
+    - master
+
+# Stage 2: Build Docker image using DinD
+dockerize:
+  stage: dockerize
+  script:
+    - echo "Logging in to GitLab container registry..."
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" "$CI_REGISTRY" --password-stdin
+    - echo "Building Docker image..."
+    - docker build -t $IMAGE_NAME .
+    - echo "Pushing image to GitLab registry..."
+    - docker push $IMAGE_NAME
+  only:
+    - main
+    - master
+
+# Stage 3: Deploy (optional)
+deploy:
+  stage: deploy
+  script:
+    - echo "Deploying $IMAGE_NAME..."
+    # Example: docker run -d -p 8080:8080 $IMAGE_NAME
+    - echo "Deployment step completed (add your commands here)"
+  only:
+    - main
