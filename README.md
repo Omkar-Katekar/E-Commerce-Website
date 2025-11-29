@@ -22,7 +22,7 @@ This project follows clean code practices, layered architecture, and includes RE
 - **Spring Security / JWT**
 - **Spring Data JPA**
 - **PostgreSQL**
-- **Docker & Docker Compose**
+- **Docker**
 
 
 
