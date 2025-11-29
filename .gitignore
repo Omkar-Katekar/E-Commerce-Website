@@ -1,0 +1,78 @@
+# === Build / IDE / OS ===
+# Maven build output
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Gradle build output (if ever used)
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# Wrapper jar (keep)
+.mvn/wrapper/maven-wrapper.jar
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+.project
+.classpath
+.settings/
+.nb-gradle/
+nbproject/private/
+
+# STS
+.apt_generated
+.factorypath
+.springBeans
+.sts4-cache
+
+# NetBeans / distribution folders
+/nbbuild/
+/dist/
+/nbdist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# === Java / artifacts ===
+*.class
+*.jar
+*.war
+*.ear
+
+# logs & process files
+*.log
+nohup.out
+
+# local DB / data dumps / binaries
+*.db
+*.sql
+dump.sql
+backup.sql
+
+# === Secrets & env ===
+.env
+.env.*
+*.env
+*.pem
+*.p12
+*.key
+secrets.json
+credentials.yml
+
+# === Docker ===
+docker-compose.override.yml
+.docker/
+**/.docker/
+
+# node / front-end (if present)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Misc
+coverage/
+reports/
