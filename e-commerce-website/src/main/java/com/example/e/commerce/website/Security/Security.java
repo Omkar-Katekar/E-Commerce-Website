@@ -37,8 +37,9 @@ public class Security {
 		http.csrf(csrf->csrf.disable())
 		.authorizeHttpRequests(request->request
 				.requestMatchers("/h2-console/**").permitAll()
-				.requestMatchers("/adduser").hasAuthority("CONSUMER")
-				//.requestMatchers("/showusers").hasAuthority("CONSUMER")
+				.requestMatchers("/adduser").hasAuthority("USER")
+				.requestMatchers("/showusers").hasAuthority("USER")
+				.requestMatchers("/orders/**","/Adproducts","/Adaddproducts","/Adupdateproducts/**","/Addeleteproducts/**").hasAuthority("ADMIN")
 			
 				.anyRequest().permitAll()
 				)
