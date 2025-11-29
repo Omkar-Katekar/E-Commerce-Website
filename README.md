@@ -1,4 +1,4 @@
-# 🚀 Project Name - E-Commerce Website
+# 🚀 Project Name : E-Commerce Website
 
 A production-ready application built using **Java + Spring Boot**, containerized with **Docker**, and designed for easy deployment.  
 This project follows clean code practices, layered architecture, and includes REST APIs with proper validation and error handling.
