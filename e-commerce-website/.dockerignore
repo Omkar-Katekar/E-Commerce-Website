@@ -1,0 +1,13 @@
+target
+build
+.docker
+.git
+.gitignore
+.vscode
+.idea
+*.iml
+*.log
+node_modules
+*.jar
+*.war
+.env
